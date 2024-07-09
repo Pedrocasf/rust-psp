@@ -1,9 +1,10 @@
 use crate::sys::TexturePixelFormat;
-use crate::sys::{sceGeEdramGetAddr, sceGeEdramGetSize};
+use crate::sys::{sceGeEdramGetAddr, sceGeEdramGetSize, sceGeEdramSetSize};
 use core::marker::PhantomData;
 use core::mem::size_of;
 use core::ptr::null_mut;
 use core::sync::atomic::{AtomicU32, Ordering};
+use crate::panic;
 
 type VramAllocator = SimpleVramAllocator;
 
@@ -70,7 +71,14 @@ pub struct SimpleVramAllocator {
 }
 
 impl SimpleVramAllocator {
-    const fn new() -> Self {
+    fn new() -> Self {
+        let two_k_plus = sceGeEdramSetSize(0x400000);
+        if(two_k_plus < 0){
+            let one_k = sceGeEdramSetSize(0x200000);
+            if(one_k < 0){
+                panic("Can not set Ge Edram size Error:{:x}", one_k);
+            }
+        };
         Self {
             offset: AtomicU32::new(0),
         }
