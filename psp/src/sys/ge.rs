@@ -571,4 +571,15 @@ psp_extern! {
     ///
     /// < 0 on error.
     pub fn sceGeUnsetCallback(cbid: i32) -> i32;
+    ///Sets the EDRAM size to be enabled.
+    ///
+    /// # Parameters
+    ///
+    /// - `size`: The size (0x200000 or 0x400000). Will return an error if 0x400000 is specified for the PSP FAT.
+    ///
+    /// # Return value
+    ///
+    /// < 0 on error.
+    #[psp(0x5BAA5439)]
+    pub fn sceGeEdramSetSize(size: i32) -> i32;
 }
