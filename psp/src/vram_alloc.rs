@@ -21,12 +21,22 @@ pub fn get_vram_allocator() -> Result<VramAllocator, VramAllocatorInUseError> {
 }
 
 pub struct VramAllocatorSingleton {
+    size: Option<usize>,
     alloc: Option<VramAllocator>,
 }
 
 impl VramAllocatorSingleton {
     pub fn get_vram_alloc(&mut self) -> Option<VramAllocator> {
-        self.alloc.take()
+        if let Some(a) = self.alloc.take(){
+            let two_k_plus = sceGeEdramSetSize(0x400000);
+            if(two_k_plus < 0){
+                let one_k = sceGeEdramSetSize(0x200000);
+                if(one_k < 0){
+                    panic("Can not set Ge eDram size. Error:{:x}", one_k);
+                }
+            };
+            return a;
+        }
     }
 }
 
@@ -71,14 +81,7 @@ pub struct SimpleVramAllocator {
 }
 
 impl SimpleVramAllocator {
-    fn new() -> Self {
-        let two_k_plus = sceGeEdramSetSize(0x400000);
-        if(two_k_plus < 0){
-            let one_k = sceGeEdramSetSize(0x200000);
-            if(one_k < 0){
-                panic("Can not set Ge Edram size Error:{:x}", one_k);
-            }
-        };
+    pub const fn new() -> Self {
         Self {
             offset: AtomicU32::new(0),
         }
