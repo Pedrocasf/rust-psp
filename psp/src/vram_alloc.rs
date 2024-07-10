@@ -4,7 +4,6 @@ use core::marker::PhantomData;
 use core::mem::size_of;
 use core::ptr::null_mut;
 use core::sync::atomic::{AtomicU32, Ordering};
-use crate::panic;
 
 type VramAllocator = SimpleVramAllocator;
 
@@ -21,22 +20,19 @@ pub fn get_vram_allocator() -> Result<VramAllocator, VramAllocatorInUseError> {
 }
 
 pub struct VramAllocatorSingleton {
-    size: Option<usize>,
     alloc: Option<VramAllocator>,
 }
 
 impl VramAllocatorSingleton {
     pub fn get_vram_alloc(&mut self) -> Option<VramAllocator> {
-        if let Some(a) = self.alloc.take(){
-            let two_k_plus = sceGeEdramSetSize(0x400000);
-            if(two_k_plus < 0){
-                let one_k = sceGeEdramSetSize(0x200000);
-                if(one_k < 0){
-                    panic("Can not set Ge eDram size. Error:{:x}", one_k);
-                }
-            };
-            return a;
-        }
+        let two_k_plus = unsafe{ sceGeEdramSetSize(0x400000) };
+        if two_k_plus < 0{
+            let one_k = unsafe{ sceGeEdramSetSize(0x200000) };
+            if one_k < 0{
+                panic!("Can not set Ge eDram size. Error:{:x}", one_k);
+            }
+        };
+        self.alloc.take()
     }
 }
 

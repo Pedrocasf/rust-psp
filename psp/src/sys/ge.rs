@@ -571,7 +571,9 @@ psp_extern! {
     ///
     /// < 0 on error.
     pub fn sceGeUnsetCallback(cbid: i32) -> i32;
-    ///Sets the EDRAM size to be enabled.
+
+    #[psp(0x5BAA5439)]
+    /// Sets the EDRAM size to be enabled.
     ///
     /// # Parameters
     ///
@@ -580,6 +582,5 @@ psp_extern! {
     /// # Return value
     ///
     /// < 0 on error.
-    #[psp(0x5BAA5439)]
     pub fn sceGeEdramSetSize(size: i32) -> i32;
 }
