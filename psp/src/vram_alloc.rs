@@ -29,7 +29,7 @@ impl VramAllocatorSingleton {
         if two_k_plus < 0{
             let one_k = unsafe{ sceGeEdramSetSize(0x200000) };
             if one_k < 0{
-                panic!("Can not set Ge eDram size. Error:{:x}", one_k);
+                //panic!("Can not set Ge eDram size. Error:{:x}", one_k);
             }
         };
         self.alloc.take()
